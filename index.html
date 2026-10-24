@@ -108,11 +108,12 @@ const PRODUCTS=[
 {id:5,name:"Temple Jewellery Haram",cat:"Jewellery",desc:"Traditional temple jewellery",price:2275,ship:80,badge:"Luxury",img:"images/temple.jpeg"},
 {id:6,name:"Banarasi Half and Half Silk Saree",cat:"Clothings",desc:"Pure Banaras silk zari work",price:999,ship:100,badge:"Premium",img:"images/Banarasi.jpeg",
   // --- ADD COLOR VARIATIONS HERE ---
-    colors: [
+  selectedColorIndex: 0, // Keeps track of current image position  
+  colors: [
       { name: "Royal Blue & Yellow", hex: "#1E1B6B", img: "images/banarasi1.jpeg" },
       { name: "Magenta & Rose Gold", hex: "#8C0F62", img: "images/banarasi2.jpeg" },
       { name: "Emerald Green", hex: "#50C878", img: "images/antique1-green.jpeg" }
-    ],
+    ],    
 }
 ];
 let cart=[];let currentCustomer=null;const UPI_ID="rsdeepi.sunil@okicici";const UPI_NAME="SJS Mode";
