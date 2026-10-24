@@ -106,7 +106,14 @@ const PRODUCTS=[
 {id:3,name:"Designer Necklace Set",cat:"Jewellery",desc:"Necklace set with earrings",price:599,ship:80,badge:"Trending",img:"images/neck.jpeg"},
 {id:4,name:"Daily wear saree collection",cat:"Clothings",desc:"Daily wear material",price:600,ship:0,badge:"Trending",img:"images/daily.jpeg"},
 {id:5,name:"Temple Jewellery Haram",cat:"Jewellery",desc:"Traditional temple jewellery",price:2275,ship:80,badge:"Luxury",img:"images/temple.jpeg"},
-{id:6,name:"Banarasi Half and Half Silk Saree",cat:"Clothings",desc:"Pure Banaras silk zari work",price:999,ship:100,badge:"Premium",img:"images/Banarasi.jpeg"}
+{id:6,name:"Banarasi Half and Half Silk Saree",cat:"Clothings",desc:"Pure Banaras silk zari work",price:999,ship:100,badge:"Premium",img:"images/Banarasi.jpeg",
+  // --- ADD COLOR VARIATIONS HERE ---
+    colors: [
+      { name: "Blue with Green", hex: "#2A2073", img: "images/banarasi1.jpeg" },
+      { name: "Ruby Red", hex: "#9B111E", img: "images/antique1-red.jpeg" },
+      { name: "Emerald Green", hex: "#50C878", img: "images/antique1-green.jpeg" }
+    ],
+}
 ];
 let cart=[];let currentCustomer=null;const UPI_ID="rsdeepi.sunil@okicici";const UPI_NAME="SJS Mode";
 let customers=JSON.parse(localStorage.getItem('sjs_customers')||'[]');
