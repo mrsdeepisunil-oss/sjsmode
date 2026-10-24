@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SJS Mode - Exclusive Jewellery & Fashion</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">SJS <span>MODE</span></div>
+  <div style="display:flex;gap:12px;align-items:center">
+    <button onclick="exportExcel()" id="adminBtn" style="background:white;border:1px solid #e8d5d9;padding:8px 14px;border-radius:100px;font-size:11px;font-weight:600;cursor:pointer;display:none">📊 Export Excel</button>
+    <div class="cart-icon" onclick="openCart()">🛒<span class="cart-count" id="cartCount">0</span></div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+  <div class="hero-content">
+    <div style="display:inline-block;background:linear-gradient(135deg,var(--gold),#b8962e);color:var(--burgundy-dark);padding:8px 22px;border-radius:100px;font-size:11px;letter-spacing:3px;font-weight:700;margin-bottom:24px;">NEW COLLECTION 2026</div>
+    <h1 class="hero-title">SJS<br>MODE</h1>
+    <p class="hero-subtitle">Exclusive Jewellery & Fashion Collections</p>
+    <div style="margin-top:36px;display:flex;gap:16px;justify-content:center">
+      <button class="btn-cart" style="width:auto;padding:16px 36px" onclick="document.querySelector('.section').scrollIntoView({behavior:'smooth'})">Shop Collection</button>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>Our Collections</h2>
+    <p>Handcrafted with Love</p>
+  </div>
+  <div class="filters">
+    <button class="filter-btn active" onclick="filterProducts('All',this)">All</button>
+    <button class="filter-btn" onclick="filterProducts('Jewellery',this)">Jewellery</button>
+    <button class="filter-btn" onclick="filterProducts('Clothings',this)">Sarees</button>
+  </div>
+  <div class="grid" id="productGrid"></div>
+</section>
+
+<!-- CUSTOMER DETAILS MODAL - NOW PROPERLY PLACED -->
+<div class="customer-modal" id="customerModal">
+  <div class="customer-form-box">
+    <h3>Enter Delivery Details</h3>
+    <p>We need your details to deliver & save to customer Excel</p>
+    <div class="form-group"><label>Full Name *</label><input type="text" id="custName" placeholder="Ex: Sunil Kumar" required></div>
+    <div class="form-row">
+      <div class="form-group"><label>Phone / WhatsApp *</label><input type="tel" id="custPhone" placeholder="Ex: 7299615915" required></div>
+      <div class="form-group"><label>Email (Optional)</label><input type="email" id="custEmail" placeholder="Ex: sunil@gmail.com"></div>
+    </div>
+    <div class="form-group"><label>Full Address *</label><textarea id="custAddress" rows="3" placeholder="House No, Street, Area, City" required></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Pincode *</label><input type="text" id="custPincode" placeholder="Ex: 642132" required></div>
+      <div class="form-group"><label>City / District *</label><input type="text" id="custCity" placeholder="Ex: Udumalpet" required></div>
+    </div>
+    <button class="btn-submit" onclick="saveCustomerAndShowUPI()">✓ Save & Show Payment QR →</button>
+    <div class="excel-info">🔒 Your details will be saved to Excel. After saving, UPI QR will appear. After payment, order + address sent to WhatsApp.</div>
+    <button onclick="closeCustomerModal()" style="width:100%;margin-top:12px;background:none;border:none;color:#888;font-size:12px;cursor:pointer">Cancel</button>
+  </div>
+</div>
+
+<!-- CART -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <h3 style="font-family:'Cormorant Garamond';font-size:22px">Your Cart</h3>
+    <button onclick="closeCart()" style="background:none;border:none;font-size:22px;cursor:pointer">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems"><p style="text-align:center;color:#999;margin-top:40px">Your cart is empty<br>Add some sparkle ✨</p></div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Products</span><span id="totalProd">₹0</span></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span>Shipping</span><span id="totalShip">₹0</span></div>
+    <div style="display:flex;justify-content:space-between;font-weight:700;font-size:18px;border-top:1px dashed #ddd;padding-top:10px"><span>Grand Total</span><span id="grandTotal">₹0</span></div>
+    
+    <div id="customerStep">
+      <button onclick="openCustomerModal()" style="width:100%;margin-top:16px;padding:14px;border-radius:100px;border:none;background:linear-gradient(135deg,var(--burgundy),#a52a44);color:white;font-weight:700;cursor:pointer">📝 Enter Delivery Details →</button>
+      <p style="font-size:11px;color:#888;text-align:center;margin-top:8px">We need your address before payment</p>
+    </div>
+    
+    <div id="upiStep" style="display:none">
+      <div style="background:#e8f5e9;border-radius:12px;padding:10px;margin:12px 0;display:flex;gap:10px;align-items:center">
+        <div style="width:36px;height:36px;background:#2e7d32;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center">✓</div>
+        <div><div style="font-size:12px;font-weight:600" id="savedCustomerName">Customer saved</div><div style="font-size:11px;color:#666" id="savedCustomerPhone">Phone saved to Excel</div></div>
+      </div>
+      <div class="upi-box">
+        <h4 style="font-size:14px;margin-bottom:8px">💳 Pay via UPI - Direct to Bank</h4>
+        <p style="font-size:11px;color:#555">UPI ID: <b>rsdeepi.sunil@okicici</b> <span style="color:#2e7d32">✓ Verified</span></p>
+        <div style="text-align:center"><div class="qr-wrap"><img id="qrImg" src="" width="180" height="180" style="display:block"></div><p style="font-size:11px;color:#666" id="qrAmount">Scan with GPay / PhonePe / Paytm</p></div>
+        <div class="upi-apps"><div class="upi-app" onclick="payUPI()">📱 GPay</div><div class="upi-app" onclick="payUPI()">💜 PhonePe</div><div class="upi-app" onclick="payUPI()">💙 Paytm</div><div class="upi-app" onclick="payUPI()">🇮🇳 BHIM</div></div>
+        <button onclick="copyUPI()" style="width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid #ccc;background:white;font-size:12px;cursor:pointer">📋 Copy UPI Link</button>
+        <button onclick="confirmPayment()" style="width:100%;margin-top:10px;padding:12px;border-radius:100px;border:none;background:#2e7d32;color:white;font-weight:700;cursor:pointer">✅ I Have Paid - Send on WhatsApp</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PRODUCTS=[
+{id:1,name:"Antique Jewellery Collection",cat:"Jewellery",desc:"Elegant handcrafted antique jewellery",price:799,ship:80,badge:"Bestseller",img:"images/antique1.jpeg"},
+{id:2,name:"Kalyani Cotton Saree",cat:"Clothings",desc:"Premium cotton saree traditional",price:1399,ship:80,badge:"New",img:"images/kalyani.jpeg"},
+{id:3,name:"Designer Necklace Set",cat:"Jewellery",desc:"Necklace set with earrings",price:599,ship:80,badge:"Trending",img:"images/neck.jpeg"},
+{id:4,name:"Daily wear saree collection",cat:"Clothings",desc:"Daily wear material",price:600,ship:0,badge:"Trending",img:"images/daily.jpeg"},
+{id:5,name:"Temple Jewellery Haram",cat:"Jewellery",desc:"Traditional temple jewellery",price:2275,ship:80,badge:"Luxury",img:"images/temple.jpeg"},
+{id:6,name:"Banarasi Half and Half Silk Saree",cat:"Clothings",desc:"Pure Banaras silk zari work",price:999,ship:100,badge:"Premium",img:"images/Banarasi.jpeg"}
+];
+let cart=[];let currentCustomer=null;const UPI_ID="rsdeepi.sunil@okicici";const UPI_NAME="SJS Mode";
+let customers=JSON.parse(localStorage.getItem('sjs_customers')||'[]');
+if(customers.length>0) document.getElementById('adminBtn').style.display='inline-block';
+
+function renderProducts(filter='All'){
+  const grid=document.getElementById('productGrid');
+  const filtered=filter==='All'?PRODUCTS:PRODUCTS.filter(p=>p.cat===filter);
+  grid.innerHTML=filtered.map(p=>`
+    <div class="card"><div class="card-img"><span class="badge">${p.badge}</span><div style="position:absolute;top:14px;right:14px;width:38px;height:38px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center">♡</div><img src="${p.img}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800'"></div>
+    <div class="card-body"><div class="cat">${p.cat}</div><div class="name">${p.name}</div><div class="desc">${p.desc}</div><div class="price-row"><span class="price">₹${p.price.toLocaleString()}</span>${p.ship>0?`<span style="font-size:11px;color:#999">+ ₹${p.ship} ship</span>`:`<span style="font-size:11px;color:#2e7d32">• Free Shipping</span>`}</div><button class="btn-cart" onclick="addToCart(${p.id},this)">Add to Cart</button></div></div>`).join('');
+}
+function filterProducts(cat,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderProducts(cat);}
+function addToCart(id,btn){const p=PRODUCTS.find(x=>x.id===id);cart.push(p);btn.innerText='✓ Added';btn.classList.add('added');setTimeout(()=>{btn.innerText='Add to Cart';btn.classList.remove('added')},1200);updateCart();openCart();}
+function updateCart(){
+  document.getElementById('cartCount').innerText=cart.length;
+  const itemsEl=document.getElementById('cartItems');const footerEl=document.getElementById('cartFooter');
+  if(cart.length===0){itemsEl.innerHTML='<p style="text-align:center;color:#999;margin-top:40px">Your cart is empty<br>Add some sparkle ✨</p>';footerEl.style.display='none';return;}
+  footerEl.style.display='block';let tp=0,ts=0;
+  itemsEl.innerHTML=cart.map((it,i)=>{tp+=it.price;ts+=it.ship;return `<div class="cart-item"><img src="${it.img}" onerror="this.src='https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800'"><div style="flex:1"><div style="font-weight:600;font-size:13px">${it.name}</div><div style="font-size:12px;color:#888">₹${it.price} + ₹${it.ship} ship</div></div><button onclick="removeItem(${i})" style="background:none;border:none;cursor:pointer">✕</button></div>`}).join('');
+  const gt=tp+ts;document.getElementById('totalProd').innerText='₹'+tp.toLocaleString();document.getElementById('totalShip').innerText='₹'+ts.toLocaleString();document.getElementById('grandTotal').innerText='₹'+gt.toLocaleString();
+  document.getElementById('qrAmount').innerText='Amount: ₹'+gt.toLocaleString()+' - Scan with GPay / PhonePe';
+  const upiLink=`upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${gt}&cu=INR&tn=${encodeURIComponent('SJS Mode Order')}`;
+  document.getElementById('qrImg').src=`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}`;
+  window.currentUPI=upiLink;window.currentTotal=gt;
+  if(!currentCustomer){document.getElementById('customerStep').style.display='block';document.getElementById('upiStep').style.display='none';}
+}
+function openCustomerModal(){document.getElementById('customerModal').classList.add('open')}
+function closeCustomerModal(){document.getElementById('customerModal').classList.remove('open')}
+function saveCustomerAndShowUPI(){
+  const name=document.getElementById('custName').value.trim();const phone=document.getElementById('custPhone').value.trim();const email=document.getElementById('custEmail').value.trim();const address=document.getElementById('custAddress').value.trim();const pincode=document.getElementById('custPincode').value.trim();const city=document.getElementById('custCity').value.trim();
+  if(!name||!phone||!address||!pincode||!city){alert('Please fill all * fields');return;}if(phone.length<10){alert('Enter valid phone');return;}
+  currentCustomer={name,phone,email,address,pincode,city,date:new Date().toLocaleString(),orderTotal:window.currentTotal,items:cart.map(c=>c.name).join(', ')};
+  customers.push(currentCustomer);localStorage.setItem('sjs_customers',JSON.stringify(customers));
+  document.getElementById('adminBtn').style.display='inline-block';
+  document.getElementById('savedCustomerName').innerText=name+' ✓';document.getElementById('savedCustomerPhone').innerText=phone+' | '+city+' - Saved to Excel';
+  document.getElementById('customerStep').style.display='none';document.getElementById('upiStep').style.display='block';closeCustomerModal();
+  alert('✓ Customer saved to Excel! Now pay via UPI.');
+}
+function exportExcel(){if(customers.length===0){alert('No customers yet');return;}const ws=XLSX.utils.json_to_sheet(customers);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Customers");ws['!cols']=[{wch:20},{wch:15},{wch:25},{wch:40},{wch:10},{wch:15},{wch:20},{wch:10},{wch:30}];XLSX.writeFile(wb,`SJS_Mode_Customers_${new Date().toISOString().slice(0,10)}.xlsx`);}
+function removeItem(i){cart.splice(i,1);updateCart()}
+function openCart(){document.getElementById('cartPanel').classList.add('open');document.getElementById('cartOverlay').classList.add('open')}
+function closeCart(){document.getElementById('cartPanel').classList.remove('open');document.getElementById('cartOverlay').classList.remove('open')}
+function payUPI(){if(window.currentUPI) window.location.href=window.currentUPI}
+function copyUPI(){navigator.clipboard.writeText(window.currentUPI);alert('UPI Link Copied!')}
+function confirmPayment(){
+  if(!currentCustomer){alert('Enter delivery details first');openCustomerModal();return;}
+  const total=document.getElementById('grandTotal').innerText;const items=cart.map(c=>`${c.name} (₹${c.price})`).join('\n');
+  const msg=`*NEW ORDER - SJS MODE* 🎉\n\n*Customer Details:*\n👤 Name: ${currentCustomer.name}\n📱 Phone: ${currentCustomer.phone}\n📧 Email: ${currentCustomer.email||'N/A'}\n📍 Address: ${currentCustomer.address}\n🏙️ City: ${currentCustomer.city}\n📮 Pincode: ${currentCustomer.pincode}\n\n*Order:*\n${items}\n\n*Total: ${total}*\n💳 Paid to UPI: ${UPI_ID}\n🔗 Link: ${window.currentUPI}\n\n*Date: ${currentCustomer.date}*`;
+  currentCustomer.status='Paid';localStorage.setItem('sjs_customers',JSON.stringify(customers));
+  window.open(`https://wa.me/917299615915?text=${encodeURIComponent(msg)}`,'_blank');
+  alert('Thank you! Order + address sent to WhatsApp. We will contact you soon!');
+}
+renderProducts();
+</script>
+</body>
+</html>
